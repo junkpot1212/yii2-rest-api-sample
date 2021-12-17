@@ -4,9 +4,9 @@ return [
     'mode'        => 'dev',
     // DB master
     'db'          => [
-        'host'     => 'db',
+        'host'     => 'aaqpdq4fcquak6.cttxsoshgybv.ap-northeast-3.rds.amazonaws.com',
         'database' => 'ebdb',
-        'username' => 'db_user',
+        'username' => 'sampleuser',
         'password' => '9q7FXS66d6Up',
     ],
     'aws'         => [
