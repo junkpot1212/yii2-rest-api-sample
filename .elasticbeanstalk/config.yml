@@ -1,0 +1,23 @@
+branch-defaults:
+  feature/infrastructure:
+    environment: Yii2apisample-env
+  main:
+    environment: null
+    group_suffix: null
+environment-defaults:
+  Yii2apisample-env:
+    branch: null
+    repository: null
+global:
+  application_name: yii2-api-sample
+  branch: null
+  default_ec2_keyname: yii2-api-sample
+  default_platform: PHP 7.4 running on 64bit Amazon Linux 2
+  default_region: ap-northeast-3
+  include_git_submodules: true
+  instance_profile: null
+  platform_name: null
+  platform_version: null
+  repository: null
+  sc: git
+  workspace_type: Application

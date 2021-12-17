@@ -1,0 +1,62 @@
+name: sample deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Restore cache
+      uses: actions/cache@v1
+      with:
+        path: vendor
+        key: vendor-${{ github.ref }}
+    - name: Restore image cache
+      uses: actions/cache@v1
+      with:
+        path: images
+        key: images-${{ github.run_id }}
+    - run: sed -i -e "s/[0-9\.]\+://g" docker-compose.yml
+    - run: bash docker-network-alias.sh -s
+    - run: docker-compose up -d db
+    - run: docker-compose build --build-arg GITHUB_OAUTH_TOKEN=${{ secrets.GITHUB_TOKEN }} api
+    - run: docker-compose up -d
+    - run: docker-compose ps
+    - run: cp -f environment/conf.dev.php environment/conf.php
+    - run: docker-compose exec -T api sh -c "cd src && composer install"
+    - run: docker-compose exec -T api src/yii migrate/up --interactive=0
+
+  deploy:
+    runs-on: ubuntu-20.04
+    needs:
+      - build
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Restore cache
+      uses: actions/cache@v1
+      with:
+        path: vendor
+        key: vendor-${{ github.ref }}
+    - name: Restore image cache
+      uses: actions/cache@v1
+      with:
+        path: images
+        key: images-${{ github.run_id }}
+    - run: sed -i -e "s/[0-9\.]\+://g" docker-compose.yml
+    - run: bash docker-network-alias.sh -s
+    - run: docker-compose up -d api
+    - run: docker-compose exec -T api sh -c "cd src && composer install"
+    - run: cp -f environment/conf.prod.php environment/conf.php
+    - uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ap-northeast-3
+    - run: pip install awsebcli
+    - run: $HOME/.local/bin/eb deploy Yii2apisample-env
