@@ -5,7 +5,7 @@ return [
     // DB master
     'db'          => [
         'host'     => 'db',
-        'database' => 'sampledb',
+        'database' => 'ebdb',
         'username' => 'db_user',
         'password' => '9q7FXS66d6Up',
     ],
